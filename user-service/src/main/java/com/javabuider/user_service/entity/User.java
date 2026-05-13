@@ -4,9 +4,16 @@ import com.javabuider.user_service.common.Gender;
 import com.javabuider.user_service.common.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -15,7 +22,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class User implements UserDetails  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -58,5 +65,38 @@ public class User {
                     .role(role)
                     .build()
             );
+        }
+
+        @Override
+        public Collection<? extends GrantedAuthority> getAuthorities() {
+            List<Role> roleList = this.userHasRoles.stream().map(UserHasRole::getRole).toList();
+            return roleList.stream()
+                    .map(role -> new SimpleGrantedAuthority(role.getName()))
+                    .collect(Collectors.toSet());
+        }
+    
+        @Override
+        public String getUsername() {
+            return this.email;
+        }
+    
+        @Override
+        public boolean isAccountNonExpired() {
+            return UserDetails.super.isAccountNonExpired();
+        }
+    
+        @Override
+        public boolean isAccountNonLocked() {
+            return UserDetails.super.isAccountNonLocked();
+        }
+    
+        @Override
+        public boolean isCredentialsNonExpired() {
+            return UserDetails.super.isCredentialsNonExpired();
+        }
+    
+        @Override
+        public boolean isEnabled() {
+            return this.userStatus == UserStatus.ACTIVE;
         }
 }
