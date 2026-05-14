@@ -1,6 +1,7 @@
 package com.javabuider.user_service.service.impl;
 
 import com.javabuider.user_service.common.RoleType;
+import com.javabuider.user_service.common.UserStatus;
 import com.javabuider.user_service.dto.request.CreateUserRequest;
 import com.javabuider.user_service.dto.response.CreateUserResponse;
 import com.javabuider.user_service.entity.Role;
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
         
         // 2. Mã hóa password
         user.setPassword(passwordEncoder.encode(request.password()));
+        user.setUserStatus(UserStatus.ACTIVE);
         
         // 3. Tạo hoặc lấy role CUSTOMER
         Role role = roleService.createRole(RoleType.CUSTOMER.name());

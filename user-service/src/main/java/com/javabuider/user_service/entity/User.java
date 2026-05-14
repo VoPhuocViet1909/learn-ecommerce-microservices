@@ -47,7 +47,8 @@ public class User implements UserDetails  {
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
-    private UserStatus userStatus;
+    @Builder.Default
+    private UserStatus userStatus = UserStatus.ACTIVE;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
@@ -97,6 +98,6 @@ public class User implements UserDetails  {
     
         @Override
         public boolean isEnabled() {
-            return this.userStatus == UserStatus.ACTIVE;
+            return this.userStatus != UserStatus.INACTIVE;
         }
 }

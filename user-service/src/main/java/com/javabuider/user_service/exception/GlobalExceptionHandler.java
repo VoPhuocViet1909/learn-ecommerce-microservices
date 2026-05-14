@@ -3,6 +3,8 @@ package com.javabuider.user_service.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,6 +37,19 @@ public class GlobalExceptionHandler {
                 .build();
         
         return ResponseEntity.status(exception.getErrorCode().getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler({BadCredentialsException.class, DisabledException.class})
+    public ResponseEntity<ErrorResponse> handleAuthenticationExceptions(Exception ex, WebRequest request) {
+        ErrorResponse response = ErrorResponse.builder()
+                .timestamp(new Date().getTime())
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                .message("Invalid email or password")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
     
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
