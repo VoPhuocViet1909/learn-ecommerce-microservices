@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -35,6 +36,9 @@ public class SecurityConfiguration {
 
     private final CustomUserDetailService userDetailService;
     private final CustomJwtDecoder jwtDecoder;
+    // Inject 2 exception handlers
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -50,7 +54,12 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                     .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder)
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                // Cấu hình exception handlers
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler))
+                .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     
             .build();
     }
