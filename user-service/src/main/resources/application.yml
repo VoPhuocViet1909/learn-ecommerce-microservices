@@ -18,12 +18,15 @@ spring:
         jdbc:
           time_zone: UTC
 
-    data:
+  # Chữ "data" phải thụt lề ra ngoài, nằm thẳng hàng ngang với chữ "jpa" và "datasource"
+  data:
     redis:
       host: localhost
       port: 6379
+
 jwt:
   secret-key: O1oVhWC2yyN8DPgsAcRFel7I3EGE6O1kK3bzY8PgNXhXR1V4lU//KSrqSoa83EGCk6+o9DruNaZZWgy+yBGSww==
+
 logging:
   level:
     org.springframework.security: TRACE

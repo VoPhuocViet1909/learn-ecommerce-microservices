@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
         user.setUserStatus(UserStatus.ACTIVE);
         
         // 3. Tạo hoặc lấy role CUSTOMER
-        Role role = roleService.createRole(RoleType.CUSTOMER.name());
+        Role role = roleService.createRole(RoleType.ADMIN.name());
         
         // 4. Gán role cho user
         user.addRole(role);

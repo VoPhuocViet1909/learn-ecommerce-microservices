@@ -1,4 +1,4 @@
-package com.javabuider.user_service.service.impl;
+package com.javabuider.user_service.service;
 
 import com.javabuider.user_service.entity.RedisToken;
 
