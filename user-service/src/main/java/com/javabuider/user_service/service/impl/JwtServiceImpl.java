@@ -9,12 +9,14 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
-import static com.javabuilder.userservice.constant.JWTConstant.*;
+import static com.javabuider.user_service.constant.JWTConstant.*;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -47,7 +49,7 @@ public class JwtServiceImpl implements JwtService {
         // Signature
         JWSObject jwsObject = new JWSObject(header, payload);
         try {
-            jwsObject.sign(new MACSigner(secretKey));
+            jwsObject.sign(new MACSigner(secretKey.getBytes(StandardCharsets.UTF_8)));
         } catch (JOSEException e) {
             throw new UserServiceException(ErrorCode.TOKEN_GENERATION_FAILED);
         }
@@ -77,7 +79,7 @@ public class JwtServiceImpl implements JwtService {
         // Signature
         JWSObject jwsObject = new JWSObject(header, payload);
         try {
-            jwsObject.sign(new MACSigner(secretKey));
+            jwsObject.sign(new MACSigner(secretKey.getBytes(StandardCharsets.UTF_8)));
         } catch (JOSEException e) {
             throw new UserServiceException(ErrorCode.TOKEN_GENERATION_FAILED);
         }

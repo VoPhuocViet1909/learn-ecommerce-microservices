@@ -19,3 +19,6 @@ spring:
           time_zone: UTC
 jwt:
   secret-key: O1oVhWC2yyN8DPgsAcRFel7I3EGE6O1kK3bzY8PgNXhXR1V4lU//KSrqSoa83EGCk6+o9DruNaZZWgy+yBGSww==
+logging:
+  level:
+    org.springframework.security: TRACE

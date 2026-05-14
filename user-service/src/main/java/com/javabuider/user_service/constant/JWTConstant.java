@@ -1,4 +1,4 @@
-package com.javabuilder.userservice.constant;
+package com.javabuider.user_service.constant;
 
 public final class JWTConstant {
     public static final String JWT_ISSUER = "https://javabuilder.online";

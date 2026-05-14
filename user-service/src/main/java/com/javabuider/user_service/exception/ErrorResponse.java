@@ -1,4 +1,5 @@
 package com.javabuider.user_service.exception;
+
 import lombok.Builder;
 
 @Builder

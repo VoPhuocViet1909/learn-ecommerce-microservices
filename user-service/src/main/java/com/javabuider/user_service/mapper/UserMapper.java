@@ -2,6 +2,7 @@ package com.javabuider.user_service.mapper;
 
 import com.javabuider.user_service.dto.request.CreateUserRequest;
 import com.javabuider.user_service.dto.response.CreateUserResponse;
+import com.javabuider.user_service.dto.response.UserDetailResponse;
 import com.javabuider.user_service.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,4 +15,6 @@ public interface UserMapper {
     User toUser(CreateUserRequest request);
     
     CreateUserResponse toCreateUserResponse(User user);
+    
+    UserDetailResponse toUserDetailResponse(User user);
 }

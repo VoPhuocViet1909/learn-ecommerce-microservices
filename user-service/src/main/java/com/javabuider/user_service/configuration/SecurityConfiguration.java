@@ -2,31 +2,36 @@ package com.javabuider.user_service.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+
+import com.javabuider.user_service.service.CustomUserDetailService;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
+@RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfiguration {
     
     private static final String[] PUBLIC_ENDPOINTS = {
         "/api/v1/users",
         "/api/v1/auth/login"
     };
-    
+
+    private final CustomUserDetailService userDetailService;
+    private final CustomJwtDecoder jwtDecoder;
+
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    // THÊM ĐOẠN NÀY ĐỂ CUNG CẤP AUTHENTICATION MANAGER CHO SPRING TÌM THẤY
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
     }
     
     @Bean
@@ -36,6 +41,17 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                 .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                    .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder)))
             .build();
     }
+
+    @Bean
+    AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return new ProviderManager(provider);
+    }
+
+
 }

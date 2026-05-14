@@ -8,7 +8,8 @@ import com.javabuider.user_service.exception.UserServiceException;
 import com.javabuider.user_service.service.AuthenticationService;
 import com.javabuider.user_service.service.JwtService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,8 +20,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "AUTHENTICATION-SERVICE")
 public class AuthenticationServiceImpl implements AuthenticationService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;

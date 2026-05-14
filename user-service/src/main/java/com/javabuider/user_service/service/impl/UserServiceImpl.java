@@ -4,6 +4,7 @@ import com.javabuider.user_service.common.RoleType;
 import com.javabuider.user_service.common.UserStatus;
 import com.javabuider.user_service.dto.request.CreateUserRequest;
 import com.javabuider.user_service.dto.response.CreateUserResponse;
+import com.javabuider.user_service.dto.response.UserDetailResponse;
 import com.javabuider.user_service.entity.Role;
 import com.javabuider.user_service.entity.User;
 import com.javabuider.user_service.exception.ErrorCode;
@@ -13,15 +14,17 @@ import com.javabuider.user_service.repository.UserRepository;
 import com.javabuider.user_service.service.RoleService;
 import com.javabuider.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "USER-SERVICE")
 public class UserServiceImpl implements UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -53,5 +56,12 @@ public class UserServiceImpl implements UserService {
         
         // 6. Convert Entity sang Response DTO
         return userMapper.toCreateUserResponse(user);
+    }
+
+    @Override
+    public UserDetailResponse myInfo(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserServiceException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserDetailResponse(user);
     }
 }
