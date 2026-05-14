@@ -1,6 +1,7 @@
 package com.javabuider.user_service.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm; // THÊM IMPORT NÀY VÀO TRÊN CÙNG
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -24,7 +25,11 @@ public class CustomJwtDecoder implements JwtDecoder {
     public void init() {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         SecretKeySpec key = new SecretKeySpec(keyBytes, "HmacSHA512");
-        nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(key).build();
+        
+        // SỬA LẠI ĐOẠN NÀY ĐỂ KÍCH HOẠT THUẬT TOÁN HS512
+        nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(key)
+                .macAlgorithm(MacAlgorithm.HS512) 
+                .build();
     }
 
     @Override
