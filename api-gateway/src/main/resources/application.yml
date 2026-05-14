@@ -3,4 +3,12 @@ server:
 
 spring:
   application:
-    name: api-gateway
+    name: api-gateway  # Tên service để register với Eureka
+
+# Thêm Eureka config
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
