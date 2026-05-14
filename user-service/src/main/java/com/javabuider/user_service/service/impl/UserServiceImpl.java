@@ -14,14 +14,17 @@ import com.javabuider.user_service.repository.UserRepository;
 import com.javabuider.user_service.service.RoleService;
 import com.javabuider.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.security.access.prepost.PreAuthorize;
+import java.util.List;
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "USER-SERVICE")
 public class UserServiceImpl implements UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -64,4 +67,15 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserServiceException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserDetailResponse(user);
     }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<UserDetailResponse> getAllUsers() {
+        // Chỉ ADMIN mới gọi được method này
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toUserDetailResponse)
+                .toList();
+    }
+
 }

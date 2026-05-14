@@ -11,12 +11,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+
 
 import com.javabuider.user_service.service.CustomUserDetailService;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
+@EnableMethodSecurity
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -43,7 +49,9 @@ public class SecurityConfiguration {
                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                 .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
-                    .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder)))
+                    .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder)
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                    
             .build();
     }
 
@@ -52,6 +60,26 @@ public class SecurityConfiguration {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailService);
         provider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(provider);
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // 1. Tạo converter để extract authorities từ JWT
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        
+        // 2. Set claim name là "roles" (thay vì "scope" mặc định)
+        // Vì trong JwtService chúng ta dùng: .claim(ROLES, roles)
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        
+        // 3. Bỏ prefix (mặc định là "SCOPE_")
+        // Set empty string để dùng trực tiếp: "ADMIN", "CUSTOMER"
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+        
+        // 4. Tạo JwtAuthenticationConverter và set converter
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        
+        return jwtAuthenticationConverter;
     }
 
 

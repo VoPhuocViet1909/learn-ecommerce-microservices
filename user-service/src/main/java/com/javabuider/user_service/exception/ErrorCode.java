@@ -8,7 +8,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND),
     TOKEN_GENERATION_FAILED(500, "Failed to generate JWT token", HttpStatus.INTERNAL_SERVER_ERROR),
     TOKEN_EXPIRED(401, "Token has expired", HttpStatus.UNAUTHORIZED),
-    TOKEN_INVALID(401, "Invalid token", HttpStatus.UNAUTHORIZED);
+    TOKEN_INVALID(401, "Invalid token", HttpStatus.UNAUTHORIZED),
+    MISSING_LOGOUT_INFO(400, "Authorization header or refresh token is missing", HttpStatus.BAD_REQUEST);
 
     private final int code;
     private final String message;

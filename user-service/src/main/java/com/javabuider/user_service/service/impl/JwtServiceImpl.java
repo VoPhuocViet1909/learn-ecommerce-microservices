@@ -1,17 +1,21 @@
 package com.javabuider.user_service.service.impl;
 
 import com.javabuider.user_service.common.TokenType;
+import com.javabuider.user_service.dto.TokenDetails;
 import com.javabuider.user_service.exception.ErrorCode;
 import com.javabuider.user_service.exception.UserServiceException;
 import com.javabuider.user_service.service.JwtService;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+// import com.nimbusds.jose.parse.ParseException;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -59,13 +63,16 @@ public class JwtServiceImpl implements JwtService {
     }
     
     @Override
-    public String generateRefreshToken(String userId) {
+    public TokenDetails generateRefreshToken(String userId) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         
         Date issueTime = new Date();
         Date expiredTime = new Date(Instant.now().plus(14, ChronoUnit.DAYS).toEpochMilli());
-        String jwtId = UUID.randomUUID().toString();
         
+
+        long ttlSeconds = ChronoUnit.SECONDS.between(Instant.now(), expiredTime.toInstant());
+                // Generate UUID cho jwtId
+        String jwtId = UUID.randomUUID().toString();
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(userId)
                 .issuer(JWT_ISSUER)
@@ -85,7 +92,14 @@ public class JwtServiceImpl implements JwtService {
         } catch (JOSEException e) {
             throw new UserServiceException(ErrorCode.TOKEN_GENERATION_FAILED);
         }
-        return jwsObject.serialize();
+        String token = jwsObject.serialize();
+        
+        // Return TokenDetails với đầy đủ thông tin
+        return TokenDetails.builder()
+                .value(token)        // Token string
+                .jwtId(jwtId)        // UUID để lưu vào Redis
+                .ttlSeconds(ttlSeconds) // TTL để set expiration trong Redis
+                .build();
     }
 
     @Override

@@ -8,18 +8,25 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
+import com.javabuider.user_service.service.RedisTokenService;
+import com.nimbusds.jwt.SignedJWT;
 import javax.crypto.spec.SecretKeySpec;
 import jakarta.annotation.PostConstruct;
-
+import java.text.ParseException;
 import java.nio.charset.StandardCharsets;
+import lombok.RequiredArgsConstructor;
+
 
 @Component
+@RequiredArgsConstructor
 public class CustomJwtDecoder implements JwtDecoder {
 
     @Value("${jwt.secret-key}")
     private String secretKey;
 
     private NimbusJwtDecoder nimbusJwtDecoder = null;
+        // Inject RedisTokenService để check blacklist
+    private final RedisTokenService redisTokenService;
 
     @PostConstruct
     public void init() {
@@ -34,6 +41,21 @@ public class CustomJwtDecoder implements JwtDecoder {
 
     @Override
     public Jwt decode(String token) throws JwtException {
+        try {
+            // Parse JWT để lấy jwtId
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            String jwtId = signedJWT.getJWTClaimsSet().getJWTID();
+            
+            // Kiểm tra jwtId có trong Redis blacklist không
+            // Nếu có → token đã bị thu hồi (user đã logout)
+            if(redisTokenService.existsByJwtId(jwtId))
+                throw new JwtException("Token is expired");
+            
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        
+        // Nếu token không trong blacklist → decode bình thường
         return nimbusJwtDecoder.decode(token);
     }
 }
