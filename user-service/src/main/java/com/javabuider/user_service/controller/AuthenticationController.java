@@ -45,4 +45,15 @@ public class AuthenticationController {
                 .data(data)
                 .build();
     }
+
+    @PostMapping("/refresh-token")
+    ApiResponse<LoginResponse> refreshToken(@CookieValue("refresh_token") String refreshToken) {
+        var data = authenticationService.refreshToken(refreshToken);
+        
+        return ApiResponse.<LoginResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Token refreshed successfully")
+                .data(data)
+                .build();
+    }
 }

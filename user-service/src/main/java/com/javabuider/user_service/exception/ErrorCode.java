@@ -6,7 +6,9 @@ public enum ErrorCode {
     INTERNAL_ERROR(500, "Unexpected error occurred while processing request in backend service", HttpStatus.INTERNAL_SERVER_ERROR),
     USER_ALREADY_EXISTS(400, "User already exists", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND),
-    TOKEN_GENERATION_FAILED(500, "Failed to generate JWT token", HttpStatus.INTERNAL_SERVER_ERROR);
+    TOKEN_GENERATION_FAILED(500, "Failed to generate JWT token", HttpStatus.INTERNAL_SERVER_ERROR),
+    TOKEN_EXPIRED(401, "Token has expired", HttpStatus.UNAUTHORIZED),
+    TOKEN_INVALID(401, "Invalid token", HttpStatus.UNAUTHORIZED);
 
     private final int code;
     private final String message;
