@@ -42,20 +42,19 @@ public class CustomJwtDecoder implements JwtDecoder {
     @Override
     public Jwt decode(String token) throws JwtException {
         try {
-            // Parse JWT để lấy jwtId
             SignedJWT signedJWT = SignedJWT.parse(token);
-            String jwtId = signedJWT.getJWTClaimsSet().getJWTID();
-            
-            // Kiểm tra jwtId có trong Redis blacklist không
-            // Nếu có → token đã bị thu hồi (user đã logout)
-            if(redisTokenService.existsByJwtId(jwtId))
-                throw new JwtException("Token is expired");
-            
+            return new Jwt(
+                    token,
+                    signedJWT.getJWTClaimsSet().getIssueTime().toInstant(),
+                    signedJWT.getJWTClaimsSet().getExpirationTime().toInstant(),
+                    signedJWT.getHeader().toJSONObject(),        // headers (tham số thứ 4)
+                    signedJWT.getJWTClaimsSet().toJSONObject()   // claims (tham số thứ 5)
+            );
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
         
         // Nếu token không trong blacklist → decode bình thường
-        return nimbusJwtDecoder.decode(token);
+        // return nimbusJwtDecoder.decode(token);
     }
 }
