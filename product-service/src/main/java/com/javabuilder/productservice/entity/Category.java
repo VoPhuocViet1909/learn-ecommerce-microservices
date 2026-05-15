@@ -1,4 +1,4 @@
-package com.javabuider.productservice.entity;
+package com.javabuilder.productservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,6 +26,9 @@ public class Category {
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    @Column
+    private String description;
 
     @OneToMany(mappedBy = "category")
     @Builder.Default
