@@ -39,6 +39,7 @@ public class CustomJwtDecoder implements JwtDecoder {
                 .build();
     }
 
+
     @Override
     public Jwt decode(String token) throws JwtException {
         try {
@@ -47,14 +48,11 @@ public class CustomJwtDecoder implements JwtDecoder {
                     token,
                     signedJWT.getJWTClaimsSet().getIssueTime().toInstant(),
                     signedJWT.getJWTClaimsSet().getExpirationTime().toInstant(),
-                    signedJWT.getHeader().toJSONObject(),        // headers (tham số thứ 4)
-                    signedJWT.getJWTClaimsSet().toJSONObject()   // claims (tham số thứ 5)
+                    signedJWT.getHeader().toJSONObject(),      // CHÚ Ý: Headers nằm ở số 4
+                    signedJWT.getJWTClaimsSet().getClaims()    // CHÚ Ý: Claims nằm ở số 5
             );
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        
-        // Nếu token không trong blacklist → decode bình thường
-        // return nimbusJwtDecoder.decode(token);
     }
 }
